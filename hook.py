@@ -35,7 +35,8 @@ def sms_reply():
         existing_user_response(from_number, user, resp, body)
     return str(resp)
 def existing_user_response(from_number, user, resp, body):
-    if(body=="Allison" or body=="Sargent" or body=="Plex" or body=="Elder"):
+    body = body.casefold()
+    if(body=="allison" or body=="sargent" or body=="plex" or body=="elder"):
         if(body in user["locations"]):
             user["locations"].remove(body)
             users.replace_one({"phone":from_number},user,False)
@@ -44,7 +45,7 @@ def existing_user_response(from_number, user, resp, body):
             user["locations"].insert(0, body)
             users.replace_one({"phone":from_number},user,False)
             resp.message("Added " + body + " to your locations")
-    elif(body=="Comfort" or body=="Rooted" or body=="Flame" or body=="Dessert"):
+    elif(body=="comfort" or body=="rooted" or body=="flame" or body=="dessert"):
         if(body in user["types"]):
             user["types"].remove(body)
             users.replace_one({"phone":from_number},user,False)
@@ -53,7 +54,7 @@ def existing_user_response(from_number, user, resp, body):
             user["types"].insert(0, body)
             users.replace_one({"phone":from_number},user,False)
             resp.message("Added " + body + " to your stations")
-    elif(body=="Breakfast" or body=="Lunch" or body=="Dinner"):
+    elif(body=="breakfast" or body=="lunch" or body=="dinner"):
         if(body in user["meals"]):
             user["meals"].remove(body)
             users.replace_one({"phone":from_number},user,False)
@@ -62,6 +63,12 @@ def existing_user_response(from_number, user, resp, body):
             user["meals"].insert(0, body)
             users.replace_one({"phone":from_number},user,False)
             resp.message("Added " + body + " to your meals")
+    elif(body=="help" or body=="settings" or body=="info"):
+        pass
+    elif(body=="start" or body=="unstop" or body=="yes"):
+        pass
+    elif(body=="cancel" or body=="end" or body=="quit" or body=="stop" or body=="stopall" or body=="unsubscribe"):
+        pass
     else:
         resp.message("Unrecognized command. Type HELP for options")
 if __name__ == "__main__":

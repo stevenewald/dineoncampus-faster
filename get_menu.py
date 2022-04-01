@@ -8,12 +8,10 @@ from twilio.rest import Client
 
 # This is not written with good programming practice. This is just written for me to get texts about what items they are pretending to have today.
 
-account_sid = os.environ['ACCOUNT_SID']
-auth_token = os.environ['AUTH_TOKEN']
-client = Client(account_sid, auth_token)
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 ffo = webdriver.FirefoxOptions()
 ffo.headless = True
+#todo: make directory load with $HOME
 ff = webdriver.Firefox(options=ffo, executable_path=r'/home/ubuntu/dineoncampus-faster/geckodriver')
 ff.get("https://dineoncampus.com/northwestern")
 time.sleep(5)
@@ -21,21 +19,21 @@ location_dropdown = ff.find_element_by_id("locations__BV_toggle_")
 time_dropdown = ff.find_element_by_id("periods__BV_toggle_")
 station_dropdown = ff.find_element_by_id("categories__BV_toggle_")
 
-allison_breakfast = ["Comfort 1", "Comfort 2", "Bakery-Dessert"]
-allison_lunch = ["Flame 3", "Bakery-Dessert"]
-allison_dinner = ["Flame 3", "Bakery-Dessert"]
+allison_breakfast = ["Comfort 1", "Comfort 2", "Rooted 1", "Flame 3", "Bakery-Dessert"]
+allison_lunch = ["Comfort 1", "Comfort 2", "Rooted 1", "Rooted 2", "Pure Eats 1", "Pure Eats 2", "Kosher", "Flame 3", "500 Degrees 1", "Bakery-Dessert"]
+allison_dinner = ["Comfort 1", "Comfort 2", "Rooted 1", "Rooted 2", "Pure Eats 1", "Pure Eats 2", "Flame 3", "500 Degrees 1", "Bakery-Dessert"]
 
-sargent_breakfast = ["Kitchen", "Desserts"]
-sargent_lunch = ["Flame", "Desserts"]
-sargent_dinner = ["Flame", "Desserts"]
+sargent_breakfast = ["Kitchen", "Rooted", "Desserts"]
+sargent_lunch = ["Kitchen", "Pure Eats", "Pure Eats Fruit", "Rooted", "Flame", "500 Degrees", "Desserts"]
+sargent_dinner = ["Kitchen", "Pure Eats", "Pure Eats Fruit", "Rooted", "Flame", "500 Degrees", "Desserts"]
 
-elder_breakfast = ["Kitchen Entree", "Kitchen Sides", "Bakery & Dessert"]
-elder_lunch = ["Flame", "Bakery & Dessert"]
+elder_breakfast = ["Kitchen Entree", "Kitchen Sides", "Rooted", "Bakery & Dessert"]
+elder_lunch = ["500 Degrees", "Flame", "Kitchen Entree", "Kitchen Sides", "Rooted", "Pure Eats", "Kosher", "Bakery & Dessert"]
 elder_dinner = ["Flame", "Bakery & Dessert"]
 
-plex_breakfast = ["Breakfast"]
-plex_lunch = ["Flame", "Bakery/Dessert"]
-plex_dinner = ["Flame", "Bakery/Dessert"]
+plex_breakfast = ["Breakfast", "Bakery/Dessert"]
+plex_lunch = ["Comfort", "Flame", "Pizza/Flatbread", "Bakery/Dessert"]
+plex_dinner = ["Comfort", "Flame", "Pizza/Flatbread", "Bakery/Dessert"]
 
 # Yes, using time.sleep is a bad way of waiting until items are loaded. But dineoncampus provides 0(0) way of knowing whether it's loading or loaded. I'm sure there's some way to
 # Check whether it's done loading, but unfortunately this is run on a $.002/hr aws ec2 instance and I simply do not care enough.
@@ -48,6 +46,7 @@ for location in locations:
     location_dropdown.click()
     location_item = ff.find_elements_by_xpath("//a[contains(text(),'" + location[0] + "')]")[0]
     location_item.click()
+    final_text+="Location begin\n"
     final_text+=location[0]+":\n"
     time.sleep(3)
     time_dropdown.click()
@@ -65,6 +64,10 @@ for location in locations:
     else:
         raise ValueError("Incorrect meal") #shouldn't trigger
     for station in stations:
+        print(station)
+        print("\n")
+        final_text = final_text + "Station Begin\n"
+        final_text = final_text + station + ":\n"
         station_dropdown.click()
         station_objs = ff.find_elements_by_xpath("//a[contains(text(),'" + station + "')]")
         if(station=="Breakfast" and location=="Plex West"):
@@ -84,17 +87,19 @@ for location in locations:
             print("error")
         if(not clicked):
             station_dropdown.click()
-        final_text+="\n"
-    final_text+="\n\n\n"
+        final_text+="Station End\n"
+    final_text+="Location End\n"
     time.sleep(1)
-print(final_text)
-message = client.messages \
-    .create(
-         body=final_text,
-         from_='+17579193238',
-         to='+17818004140'
-     )
-    
+path = ""
+if(meal=="Breakfast"):
+    path = "/home/ubuntu/menus/breakfast"
+elif(meal=="Lunch"):
+    path = "/home/ubuntu/menus/lunch"
+elif(meal=="Dinner"):
+    path = "/home/ubuntu/menus/lunch"
+f = open(path, 'w')
+f.write(final_text)
+f.close()
 #ff.save_screenshot(r'C:/Users/steve/Desktop/menu/1.png')
 #pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract'
 #print(pytesseract.image_to_string(r'C:\Users\steve\Desktop\menu\1.png'))

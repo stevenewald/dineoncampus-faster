@@ -2,6 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import sys
 import time
+import json
 import os
 import warnings
 from twilio.rest import Client
@@ -42,6 +43,7 @@ locations = [["Allison", [allison_breakfast, allison_lunch, allison_dinner]], ["
 meals = ["Breakfast", "Lunch", "Dinner"]
 meal = meals[int(sys.argv[1])]
 final_text = "Meal options for " + meal + ":\n"
+food_options = {}
 for location in locations:
     location_dropdown.click()
     location_item = ff.find_elements_by_xpath("//a[contains(text(),'" + location[0] + "')]")[0]
@@ -50,7 +52,7 @@ for location in locations:
     final_text+=location[0]+":\n"
     time.sleep(3)
     time_dropdown.click()
-    time.sleep(.5)
+    time.sleep(1)
     meal_item = ff.find_elements_by_xpath("//a[contains(text(),'" + meal + "')]")[0]
     meal_item.click()
     time.sleep(5)
@@ -63,7 +65,10 @@ for location in locations:
         stations = stations[2]
     else:
         raise ValueError("Incorrect meal") #shouldn't trigger
+    food_options[location[0]] = {}
     for station in stations:
+        time.sleep(1)
+        food_options[location[0]][station] = []
         print(station)
         print("\n")
         final_text = final_text + "Station Begin\n"
@@ -75,21 +80,21 @@ for location in locations:
         clicked = False
         try:
             station_objs[0].click()
+            time.sleep(.5)
             clicked = True
             all_items = ff.find_elements_by_class_name("menu-tile-item")
             for item in all_items:
                 food = item.text
                 food = food[0:food.index("\n")]
-                if(meal=="Breakfast" and (food.find("Pancakes")==-1 and food.find("Bacon")==-1)):
-                    continue
                 final_text+=food+"\n"
+                food_options[location[0]][station].insert(0, food)
         except:
             print("error")
         if(not clicked):
             station_dropdown.click()
         final_text+="Station End\n"
     final_text+="Location End\n"
-    time.sleep(1)
+    time.sleep(2)
 path = ""
 if(meal=="Breakfast"):
     path = "/home/ubuntu/menus/breakfast"
@@ -97,8 +102,9 @@ elif(meal=="Lunch"):
     path = "/home/ubuntu/menus/lunch"
 elif(meal=="Dinner"):
     path = "/home/ubuntu/menus/lunch"
+json_obj = json.dumps(food_options)
 f = open(path, 'w')
-f.write(final_text)
+f.write(json_obj)
 f.close()
 #ff.save_screenshot(r'C:/Users/steve/Desktop/menu/1.png')
 #pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract'

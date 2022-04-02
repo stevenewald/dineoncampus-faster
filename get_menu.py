@@ -21,7 +21,7 @@ time_dropdown = ff.find_element_by_id("periods__BV_toggle_")
 station_dropdown = ff.find_element_by_id("categories__BV_toggle_")
 
 allison_breakfast = ["Comfort 1", "Comfort 2", "Rooted 1", "Flame 3", "Bakery-Dessert"]
-allison_lunch = ["Comfort 1", "Comfort 2", "Rooted 1", "Rooted 2", "Pure Eats 1", "Pure Eats 2", "Kosher", "Flame 3", "500 Degrees 1", "Bakery-Dessert"]
+allison_lunch = ["Comfort 1", "Comfort 2", "Rooted 1", "Rooted 2", "Pure Eats 1", "Pure Eats 2", "Flame 3", "500 Degrees 1", "Bakery-Dessert"]
 allison_dinner = ["Comfort 1", "Comfort 2", "Rooted 1", "Rooted 2", "Pure Eats 1", "Pure Eats 2", "Flame 3", "500 Degrees 1", "Bakery-Dessert"]
 
 sargent_breakfast = ["Kitchen", "Rooted", "Desserts"]
@@ -29,7 +29,7 @@ sargent_lunch = ["Kitchen", "Pure Eats", "Pure Eats Fruit", "Rooted", "Flame", "
 sargent_dinner = ["Kitchen", "Pure Eats", "Pure Eats Fruit", "Rooted", "Flame", "500 Degrees", "Desserts"]
 
 elder_breakfast = ["Kitchen Entree", "Kitchen Sides", "Rooted", "Bakery & Dessert"]
-elder_lunch = ["500 Degrees", "Flame", "Kitchen Entree", "Kitchen Sides", "Rooted", "Pure Eats", "Kosher", "Bakery & Dessert"]
+elder_lunch = ["500 Degrees", "Flame", "Kitchen Entree", "Kitchen Sides", "Rooted", "Pure Eats", "Bakery & Dessert"]
 elder_dinner = ["Flame", "Bakery & Dessert"]
 
 plex_breakfast = ["Breakfast", "Bakery/Dessert"]
@@ -53,8 +53,11 @@ for location in locations:
     time.sleep(3)
     time_dropdown.click()
     time.sleep(1)
-    meal_item = ff.find_elements_by_xpath("//a[contains(text(),'" + meal + "')]")[0]
-    meal_item.click()
+    meal_items = ff.find_elements_by_xpath("//a[contains(text(),'" + meal + "')]")
+    if(len(meal_items)==0):
+        continue # meal not available (elder and plex on sundays for example)
+    else:
+        meal_items[0].click()
     time.sleep(5)
     stations = location[1]
     if(meal=="Breakfast"):
@@ -70,16 +73,19 @@ for location in locations:
         time.sleep(1)
         food_options[location[0]][station] = []
         print(station)
-        print("\n")
         final_text = final_text + "Station Begin\n"
         final_text = final_text + station + ":\n"
         station_dropdown.click()
         station_objs = ff.find_elements_by_xpath("//a[contains(text(),'" + station + "')]")
-        if(station=="Breakfast" and location=="Plex West"):
-            station_objs = [station_objs[1]]
+        if(station=="Pure Eats" and location[0]=="Sargent" and (meal=="Lunch" or meal=="Dinner")):
+            station_objs = [station_objs[0]]
+        if(station=="Rooted" and location[0]=="Sargent" and (meal=="Lunch" or meal=="Dinner")):
+            station_objs = [station_objs[0]]
         clicked = False
         try:
-            station_objs[0].click()
+            print(str(len(station_objs)))
+            len_stations = len(station_objs)
+            station_objs[len_stations-1].click()
             time.sleep(.5)
             clicked = True
             all_items = ff.find_elements_by_class_name("menu-tile-item")
@@ -101,7 +107,7 @@ if(meal=="Breakfast"):
 elif(meal=="Lunch"):
     path = "/home/ubuntu/menus/lunch"
 elif(meal=="Dinner"):
-    path = "/home/ubuntu/menus/lunch"
+    path = "/home/ubuntu/menus/dinner"
 json_obj = json.dumps(food_options)
 f = open(path, 'w')
 f.write(json_obj)

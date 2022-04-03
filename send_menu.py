@@ -41,17 +41,20 @@ while(True):
             continue
         if(not curr_meal in meals):
             continue
-        message = "Meal options for " + curr_meal + " on " + date.today().strftime("%B %d") + ":\n\n"
+        messages = []
+        prev_message = "Meal options for " + curr_meal + " on " + date.today().strftime("%B %d") + ":\n\n"
         first_location = True
         for location in locations:
-            if(not first_location):
-                message = message + "\n\n"
-            first_location = False
+            location_message = ""
             if(location=="Plex"):
                 location = "Plex West"
+            if(location not in all_food):
+                continue
+            if((not first_location)):
+                location_message = "\n================\n\n"
+            first_location = False
             curr_location = all_food[location]
-            message = message + location + ":\n"
-            first_station = True
+            location_message = location_message + location + ":\n"
             for station in curr_location:
                 if((not "Comfort" in types) and (station=="Comfort 1" or station=="Comfort 2" or station=="Kitchen" or station=="Kitchen Entree" or station=="Kitchen Sides" or station=="Comfort")):
                     continue
@@ -63,14 +66,30 @@ while(True):
                     continue
                 if((not "Dessert" in types) and (station=="Bakery/Dessert" or station=="Bakery & Dessert" or station=="Desserts" or station=="Bakery-Dessert")):
                     continue
-                if(not first_station):
-                    message = message + "\n"
-                first_station = False
-                message = message + station + ":\n"
+                location_message = location_message + "\n"
+                location_message = location_message + station + ":\n"
                 for item in curr_location[station]:
-                    message = message + item + "\n"
-        print(message)
-        message1 = client.messages.create(body=message, from_='+17579193238', to=to_number)
+                    location_message = location_message + item + "\n"
+            temp_full_message = prev_message+location_message
+            if(len(temp_full_message)>1500):
+                messages.insert(len(messages), location_message[19:len(location_message)-1])
+                prev_message = location_message[19:len(location_message)-1]
+            else:
+                if(messages.count(prev_message)>0):
+                    messages.remove(prev_message)
+                messages.insert(len(messages), temp_full_message)
+                prev_message = temp_full_message
+        print("Messages length: ")
+        print(str(len(messages)))
+        if(len(messages)>2):
+            print("Too many")
+            for mess in messages:
+                print(mess)
+                print("\n\n\n\n\n")
+            messages = []
+            break
+        for indiv_message in messages:
+            client.messages.create(body=indiv_message, from_='+17579193238', to=to_number)
     except StopIteration:
         print("Finished iterating through users")
         break

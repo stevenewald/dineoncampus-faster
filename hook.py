@@ -4,6 +4,7 @@ import os
 from twilio.rest import Client
 from pymongo import MongoClient
 import pymongo
+from profanity_check import predict, predict_prob
 from datetime import date
 account_sid = os.environ['ACCOUNT_SID']
 auth_token = os.environ['AUTH_TOKEN']
@@ -36,6 +37,9 @@ def sms_reply():
     return str(resp)
 def existing_user_response(from_number, user, resp, body):
     body = body.casefold()
+    if(predict([body])>.7):
+        resp.message("Reported to morty")
+        return str(resp)
     if(body=="allison" or body=="sargent" or body=="plex" or body=="elder"):
         if(body.capitalize() in user["locations"]):
             user["locations"].remove(body.capitalize())
@@ -45,7 +49,7 @@ def existing_user_response(from_number, user, resp, body):
             user["locations"].insert(0, body.capitalize())
             users.replace_one({"phone":from_number},user,False)
             resp.message("Added " + body + " to your locations")
-    elif(body=="comfort" or body=="rooted" or body=="flame" or body=="dessert"):
+    elif(body=="comfort" or body=="rooted" or body=="flame" or body=="dessert" or body=="500 degrees"):
         if(body.capitalize() in user["types"]):
             user["types"].remove(body.capitalize())
             users.replace_one({"phone":from_number},user,False)

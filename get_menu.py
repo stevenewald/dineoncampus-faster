@@ -30,7 +30,7 @@ sargent_dinner = ["Kitchen", "Pure Eats", "Pure Eats Fruit", "Rooted", "Flame", 
 
 elder_breakfast = ["Kitchen Entree", "Kitchen Sides", "Rooted", "Bakery & Dessert"]
 elder_lunch = ["500 Degrees", "Flame", "Kitchen Entree", "Kitchen Sides", "Rooted", "Pure Eats", "Bakery & Dessert"]
-elder_dinner = ["Flame", "Bakery & Dessert"]
+elder_dinner = ["500 Degrees", "Kitchen Entree", "Kitchen Sides", "Rooted", "Pure Eats", "Flame", "Bakery & Dessert"]
 
 plex_breakfast = ["Breakfast", "Bakery/Dessert"]
 plex_lunch = ["Comfort", "Flame", "Pizza/Flatbread", "Bakery/Dessert"]

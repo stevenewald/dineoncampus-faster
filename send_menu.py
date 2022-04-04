@@ -74,6 +74,7 @@ while(True):
             if(len(temp_full_message)>1500):
                 messages.insert(len(messages), location_message[19:len(location_message)-1])
                 prev_message = location_message[19:len(location_message)-1]
+                print("Truncating messages")
             else:
                 if(messages.count(prev_message)>0):
                     messages.remove(prev_message)

@@ -75,6 +75,37 @@ def existing_user_response(from_number, user, resp, body):
     elif(body=="cancel" or body=="end" or body=="quit" or body=="stop" or body=="stopall" or body=="unsubscribe"):
         user["active"] = False
         users.replace_one({"phone":from_number},user,False)
+    elif(body=="stations"):
+        station_list = user["types"]
+        station_string = "Your stations: "
+        for station in station_list:
+            station_string = station_string + station.casefold() + ", "
+        if(len(station_list)>0):
+            station_string = station_string[0:len(station_string)-2]
+        resp.message(station_string)
+    elif(body=="locations"):
+        location_list = user["locations"]
+        location_string = "Your locations: "
+        for location in location_list:
+            location_string = location_string + location.casefold() + ", "
+        if(len(location_list)>0):
+            location_string = location_string[0:len(location_string)-2]
+        resp.message(location_string)
+    elif(body=="meals"):
+        meal_list_unsorted = user["meals"]
+        meal_string = "Your meals: "
+        meal_list = []
+        if(meal_list_unsorted.count("Dinner")>0):
+            meal_list.insert(0, "dinner")
+        if(meal_list_unsorted.count("Lunch")>0):
+            meal_list.insert(0, "lunch")
+        if(meal_list_unsorted.count("Breakfast")>0):
+            meal_list.insert(0, "breakfast")
+        for meal in meal_list:
+            meal_string = meal_string + meal + ", "
+        if(len(meal_list)>0):
+            meal_string = meal_string[0:len(meal_string)-2]
+        resp.message(meal_string)
     else:
         resp.message("Unrecognized command. Type HELP for options")
 if __name__ == "__main__":

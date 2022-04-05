@@ -36,10 +36,12 @@ plex_breakfast = ["Breakfast", "Bakery/Dessert"]
 plex_lunch = ["Comfort", "Flame", "Pizza/Flatbread", "Bakery/Dessert"]
 plex_dinner = ["Comfort", "Flame", "Pizza/Flatbread", "Bakery/Dessert"]
 
+plex_east = ["Pure Eats", "Pure Eats Salad", "Pure Eats Soup", "Pure Eats Stir Fry"]
+
 # Yes, using time.sleep is a bad way of waiting until items are loaded. But dineoncampus provides 0(0) way of knowing whether it's loading or loaded. I'm sure there's some way to
 # Check whether it's done loading, but unfortunately this is run on a $.002/hr aws ec2 instance and I simply do not care enough.
 
-locations = [["Allison", [allison_breakfast, allison_lunch, allison_dinner]], ["Sargent", [sargent_breakfast, sargent_lunch, sargent_dinner]], ["Elder", [elder_breakfast, elder_lunch, elder_dinner]], ["Plex West", [plex_breakfast, plex_lunch, plex_dinner]]]
+locations = [["Allison", [allison_breakfast, allison_lunch, allison_dinner]], ["Sargent", [sargent_breakfast, sargent_lunch, sargent_dinner]], ["Elder", [elder_breakfast, elder_lunch, elder_dinner]], ["Plex West", [plex_breakfast, plex_lunch, plex_dinner]], ["Plex East", [plex_east, plex_east, plex_east]]]
 meals = ["Breakfast", "Lunch", "Dinner"]
 meal = meals[int(sys.argv[1])]
 final_text = "Meal options for " + meal + ":\n"
@@ -50,7 +52,7 @@ for location in locations:
     location_item.click()
     final_text+="Location begin\n"
     final_text+=location[0]+":\n"
-    time.sleep(3)
+    time.sleep(5)
     time_dropdown.click()
     time.sleep(1)
     meal_items = ff.find_elements_by_xpath("//a[contains(text(),'" + meal + "')]")
@@ -62,6 +64,8 @@ for location in locations:
     stations = location[1]
     if(meal=="Breakfast"):
         stations = stations[0]
+        if(location[0]=="Plex East"):
+            continue
     elif(meal=="Lunch"):
         stations = stations[1]
     elif(meal=="Dinner"):
@@ -80,6 +84,8 @@ for location in locations:
         if(station=="Pure Eats" and location[0]=="Sargent" and (meal=="Lunch" or meal=="Dinner")):
             station_objs = [station_objs[0]]
         if(station=="Rooted" and location[0]=="Sargent" and (meal=="Lunch" or meal=="Dinner")):
+            station_objs = [station_objs[0]]
+        if(station=="Pure Eats" and location[0]=="Plex East"):
             station_objs = [station_objs[0]]
         clicked = False
         try:

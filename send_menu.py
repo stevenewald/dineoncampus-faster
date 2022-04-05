@@ -48,6 +48,7 @@ while(True):
             location_message = ""
             if(location=="Plex"):
                 location = "Plex West"
+                locations.insert(locations.index("Plex")+1, "Plex East")
             if(location not in all_food):
                 continue
             if((not first_location)):
@@ -58,7 +59,7 @@ while(True):
             for station in curr_location:
                 if((not "Comfort" in types) and (station=="Comfort 1" or station=="Comfort 2" or station=="Kitchen" or station=="Kitchen Entree" or station=="Kitchen Sides" or station=="Comfort")):
                     continue
-                if((not "Rooted" in types) and (station=="Rooted 1" or station=="Rooted 2" or station=="Rooted" or station=="Pure Eats 1" or station=="Pure Eats 2" or station=="Pure Eats" or station=="Pure Eats Fruit")):
+                if((not "Rooted" in types) and (station=="Rooted 1" or station=="Rooted 2" or station=="Rooted" or station=="Pure Eats 1" or station=="Pure Eats 2" or station=="Pure Eats Salad" or station=="Pure Eats Soup" or station=="Pure Eats Stir Fry" or station=="Pure Eats" or station=="Pure Eats Fruit")):
                     continue
                 if((not "Flame" in types) and (station=="Flame 3" or station=="Flame")):
                     continue
